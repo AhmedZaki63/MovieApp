@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">MovieApp</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_map">Map</string>
+    <string name="action_share">Share</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- General settings -->
+    <string name="pref_header_general">General</string>
+    <!-- Location -->
+    <string name="pref_title_location">Location</string>
+    <string name="pref_default_location">94043</string>
+    <string name="preps_location_key">prefs_location_key</string>
+    <!-- Sorting Choice -->
+    <string name="pref_title_choice">Sort by</string>
+    <string name="pref_default_choice">now_playing</string>
+    <string name="prefs_choices_list_key">prefs_choices_list_key</string>
+    <string-array name="pref_choices_list_titles">
+        <item>Now Playing</item>
+        <item>Popular</item>
+        <item>Top Rated</item>
+        <item>Upcoming</item>
+    </string-array>
+    <string-array name="pref_choices_list_values">
+        <item>now_playing</item>
+        <item>popular</item>
+        <item>top_rated</item>
+        <item>upcoming</item>
+    </string-array>
+    <!-- Themes -->
+    <string name="pref_title_themes">Themes</string>
+    <string name="pref_default_theme">white</string>
+    <string name="prefs_themes_list_key">prefs_themes_list_key</string>
+    <string-array name="pref_themes_list_titles">
+        <item>White</item>
+        <item>Black</item>
+    </string-array>
+    <string-array name="pref_themes_list_values">
+        <item>white</item>
+        <item>black</item>
+    </string-array>
+</resources>
