@@ -8,10 +8,14 @@
         android:title="@string/pref_title_choice" />
 
     <ListPreference
-        android:defaultValue="@string/pref_default_theme"
-        android:entries="@array/pref_themes_list_titles"
-        android:entryValues="@array/pref_themes_list_values"
-        android:key="@string/prefs_themes_list_key"
-        android:title="@string/pref_title_themes" />
+        android:defaultValue="@string/pref_default_poster_quality"
+        android:entries="@array/pref_poster_quality_list_titles"
+        android:entryValues="@array/pref_poster_quality_list_values"
+        android:key="@string/prefs_poster_quality_list_key"
+        android:title="@string/pref_title_poster_quality" />
+
+    <Preference
+        android:key="@string/prefs_clear_favourite_key"
+        android:title="@string/prefs_title_clear_favourite" />
 
 </PreferenceScreen>

@@ -1,13 +1,18 @@
-package com.example.ahmed.movieapp;
+package com.example.ahmed.movieapp.Main;
 
+import android.animation.ObjectAnimator;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,8 +21,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.example.ahmed.movieapp.Adapters.MovieAdapter;
+import com.example.ahmed.movieapp.BuildConfig;
+import com.example.ahmed.movieapp.DataBase.DataBase;
+import com.example.ahmed.movieapp.DataListener;
+import com.example.ahmed.movieapp.Models.Movie;
+import com.example.ahmed.movieapp.R;
+import com.example.ahmed.movieapp.Settings.SettingsActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,6 +51,8 @@ public class MainFragment extends Fragment {
 
     private MovieAdapter movieAdapter;
     private ArrayList<Movie> moviesList;
+    private ProgressBar progressBar;
+    private DataListener dataListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,6 +62,7 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.main, menu);
     }
 
@@ -53,7 +71,7 @@ public class MainFragment extends Fragment {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_refresh:
-                Toast.makeText(getActivity(), "Updating", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Updating...", Toast.LENGTH_SHORT).show();
                 updateMovies();
                 return true;
             case R.id.action_settings:
@@ -71,48 +89,72 @@ public class MainFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
         moviesList = new ArrayList<>();
         movieAdapter = new MovieAdapter(getContext(), moviesList);
 
-        ListView listView = (ListView) view.findViewById(R.id.listView);
-        listView.setAdapter(movieAdapter);
+        GridView gridView = (GridView) view.findViewById(R.id.movies_view);
+        gridView.setAdapter(movieAdapter);
+        //determine the number of columns in the grid view according to available screen
+        int orientation = getActivity().getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT && getActivity().findViewById(R.id.details_frame_layout) != null)
+            gridView.setNumColumns(2);
+        else if (orientation == Configuration.ORIENTATION_LANDSCAPE && getActivity().findViewById(R.id.details_frame_layout) == null)
+            gridView.setNumColumns(4);
+        else
+            gridView.setNumColumns(3);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String movieId = movieAdapter.getItem(position).getId();
-                String movieTitle = movieAdapter.getItem(position).getTitle();
-                String movieCover = movieAdapter.getItem(position).getCover();
-                String moviePoster = movieAdapter.getItem(position).getPoster();
-                String movieOverview = movieAdapter.getItem(position).getOverview();
-                String movieVote = movieAdapter.getItem(position).getVote();
-                Intent intent = new Intent(getContext(), DetailsActivity.class)
-                        .putExtra("Id", movieId)
-                        .putExtra("Title", movieTitle)
-                        .putExtra("Cover", movieCover)
-                        .putExtra("Poster", moviePoster)
-                        .putExtra("Overview", movieOverview)
-                        .putExtra("Vote", movieVote);
-                startActivity(intent);
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                ImageView imageView = (ImageView) view.findViewById(R.id.list_item_image);
+                ObjectAnimator flip = ObjectAnimator.ofFloat(imageView, "rotationY", 0f, 360f);
+                flip.setDuration(400).start();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        String movieId = movieAdapter.getItem(position).getId();
+                        String movieTitle = movieAdapter.getItem(position).getTitle();
+                        String movieCover = movieAdapter.getItem(position).getCover();
+                        String moviePoster = movieAdapter.getItem(position).getPoster();
+                        String movieOverview = movieAdapter.getItem(position).getOverview();
+                        String movieVote = movieAdapter.getItem(position).getVote();
+                        dataListener.setMovieData(movieTitle, movieId, moviePoster, movieCover, movieOverview, movieVote);
+                    }
+                }, 400);
             }
         });
-
         return view;
     }
 
     private void updateMovies() {
         //Creating object from AsyncTask class
-        FetchMovieTask movieTask = new FetchMovieTask();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String choice = prefs.getString(
                 getString(R.string.prefs_choices_list_key), getString(R.string.pref_default_choice));
-        movieTask.execute(choice);
+        if (choice.equals("favourite")) {
+            DataBase dataBase = new DataBase(getActivity());
+            movieAdapter.clear();
+            movieAdapter.addAll(dataBase.getMoviesFromRealm());
+            movieAdapter.notifyDataSetChanged();
+            progressBar.setVisibility(View.GONE);
+        } else {
+            FetchMovieTask movieTask = new FetchMovieTask();
+            movieTask.execute(choice);
+        }
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         updateMovies();
+    }
+
+    public void setDataListener(DataListener dataListener) {
+        this.dataListener = dataListener;
     }
 
     public class FetchMovieTask extends AsyncTask<String, Void, Movie[]> {
@@ -181,24 +223,19 @@ public class MainFragment extends Fragment {
 
                 // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
+                StringBuilder builder = new StringBuilder();
+                if (inputStream == null)
                     return null;
-                }
 
                 reader = new BufferedReader(new InputStreamReader(inputStream));
 
-                String line;
-                while ((line = reader.readLine()) != null)
-                    buffer.append(line + "\n");
+                String line = reader.readLine();
+                builder.append(line);
 
-                if (buffer.length() == 0) {
-                    // Nothing to do.
+                if (builder.length() == 0)
                     return null;
-                }
 
-                movieJsonStr = buffer.toString();
+                movieJsonStr = builder.toString();
                 Log.v(LOG_TAG, "Movie Jason String: " + movieJsonStr);
             } catch (IOException e) {
                 try {
@@ -239,11 +276,21 @@ public class MainFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Movie[] result) {
+            progressBar.setVisibility(View.GONE);
             if (result != null) {
                 moviesList = new ArrayList<>(Arrays.asList(result));
                 movieAdapter.clear();
                 movieAdapter.addAll(moviesList);
                 movieAdapter.notifyDataSetChanged();
+            } else {
+                AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                alert.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+                AlertDialog dialog = alert.create();
+                dialog.setTitle("Sorry No Internet Connection");
+                dialog.show();
             }
         }
     }

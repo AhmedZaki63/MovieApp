@@ -2,60 +2,115 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:baselineAligned="false"
     android:orientation="horizontal"
     android:weightSum="3">
 
     <RelativeLayout
         android:layout_width="0sp"
         android:layout_height="match_parent"
-        android:layout_marginTop="0sp"
-        android:layout_weight="1.1">
+        android:layout_weight="1">
 
         <ImageView
             android:id="@+id/details_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@android:drawable/sym_def_app_icon" />
+            android:scaleType="fitXY"
+            android:src="@drawable/placeholder" />
 
         <ImageButton
-            android:id="@+id/play_button"
-            android:layout_width="50sp"
-            android:layout_height="50sp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/play"
-            android:visibility="invisible" />
+            android:id="@+id/favourite_button"
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="7sp" />
     </RelativeLayout>
 
     <ScrollView
         android:layout_width="0sp"
         android:layout_height="match_parent"
-        android:layout_weight="1.9"
+        android:layout_weight="2"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="30sp"
-            android:paddingRight="30sp">
-
-            <RatingBar
-                android:id="@+id/details_rate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:isIndicator="true"
-                android:numStars="5"
-                android:stepSize="0.1" />
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp">
 
             <TextView
-                android:id="@+id/details_text"
+                android:id="@+id/details_title"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="Text"
+                android:paddingBottom="20sp"
+                android:paddingTop="10sp"
+                android:text="Title"
+                android:textSize="35sp" />
+
+            <TextView
+                android:id="@+id/details_rate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingBottom="10sp"
+                android:text="Rate"
                 android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/details_overview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="Overview"
+                android:textSize="25sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="10sp"
+                android:background="@android:color/darker_gray" />
+
+            <TextView
+                android:id="@+id/videos_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trailers :"
+                android:textSize="25sp" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/videos_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <RelativeLayout
+                android:id="@+id/videos_placeholder"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/video_item_height">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/no_trailers_text"
+                    android:textSize="20sp" />
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/review_button"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/video_item_height"
+                android:text="Go to Reviews" />
+
+            <ExpandableListView
+                android:id="@+id/review_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
 
         </LinearLayout>
 

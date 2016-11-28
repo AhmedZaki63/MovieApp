@@ -1,4 +1,4 @@
-package com.example.ahmed.movieapp;
+package com.example.ahmed.movieapp.Settings;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

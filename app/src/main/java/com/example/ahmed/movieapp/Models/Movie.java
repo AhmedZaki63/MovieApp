@@ -1,9 +1,14 @@
-package com.example.ahmed.movieapp;
+package com.example.ahmed.movieapp.Models;
 
 public class Movie {
-    private final String title, id, poster, cover, overview, vote;
+    private String title;
+    private String id;
+    private String poster;
+    private String cover;
+    private String overview;
+    private String vote;
 
-    Movie(String title, String id, String poster, String cover, String overview, String vote) {
+    public Movie(String title, String id, String poster, String cover, String overview, String vote) {
         this.title = title;
         this.id = id;
         this.poster = poster;
